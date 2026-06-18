@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+       <!--"http://hibernate.org"> -->
+<hibernate-configuration>
+    <session-factory>
+        <!-- Базовые настройки PostgreSQL -->
+        <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+        <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/postgres</property>
+        <property name="hibernate.connection.username">postgres</property>
+        <property name="hibernate.connection.password">postgres</property>
+
+        <!-- Подключение провайдера HikariCP -->
+        <property name="hibernate.connection.provider_class">org.hibernate.hikaricp.internal.HikariCPConnectionProvider</property>
+
+        <!-- Специфичные настройки HikariCP (префикс hibernate.hikari.) -->
+        <!-- Максимальное количество одновременных подключений к базе -->
+        <property name="hibernate.hikari.maximumPoolSize">10</property>
+
+        <!-- Минимальное количество резервных подключений -->
+        <property name="hibernate.hikari.minimumIdle">5</property>
+
+        <!-- Время ожидания свободного подключения из пула (в мс) перед ошибкой -->
+        <property name="hibernate.hikari.connectionTimeout">30000</property>
+
+        <!-- Максимальное время жизни подключения в пуле (в мс) -->
+        <property name="hibernate.hikari.maxLifetime">1800000</property>
+
+        <!-- Время удержания незанятого подключения до его закрытия (в мс) -->
+        <property name="hibernate.hikari.idleTimeout">600000</property>
+
+        <property name="hibernate.hbm2ddl.auto">create-drop</property>
+
+        <!-- Дополнительные настройки Hibernate (отображение SQL в консоли) -->
+        <property name="hibernate.show_sql">true</property>
+        <property name="hibernate.format_sql">true</property>
+    </session-factory>
+</hibernate-configuration>
