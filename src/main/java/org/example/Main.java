@@ -1,50 +1,47 @@
 package org.example;
 
-import org.example.dao.UsersDAO;
+import org.example.dao.AppConfig;
 
-import org.example.entity.Users;
+import org.example.entity.User;
+import org.example.service.UserService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.ComponentScan;
 
 import java.util.List;
+import java.util.Optional;
 
-@ComponentScan
 public class Main {
     public static void main(String[] args) {
-        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(Main.class);
-        UsersDAO usersDAO = context.getBean(UsersDAO.class);
 
-        System.out.println("--- Пользователи ---");
-        Users users1 = new Users("Паша");
-        Users users2 = new Users("Лева");
-        Users users3 = new Users("Cева");
+        try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class)) {
+            UserService userService = context.getBean(UserService.class);
 
-        usersDAO.saveUsers(users1);
-        usersDAO.saveUsers(users2);
-        usersDAO.saveUsers(users3);
+            System.out.println("--- Создание пользователей --- ");
+            userService.createUser("Леша");
+            userService.createUser("Паша");
+            userService.createUser("Валера");
 
-        System.out.println("\n--- Чтение всех пользователей ---");
-        List<Users> usersList = usersDAO.getAllUsers();
-        usersList.forEach(System.out::println);
+            System.out.println("\n--- Список всех пользователей ---");
+            List<User> users = userService.getAllUsers();
+            users.forEach(System.out::println);
 
-        System.out.println("\n--- Обновление пользователя ---");
-        if (!usersList.isEmpty()) {
-            Users firstUsers = usersList.get(0);
-            firstUsers.setUserName("Глория");
-            usersDAO.updateUsers(firstUsers);
-            System.out.println("Обновленный пользователь: " + usersDAO.getUsersById(firstUsers.getId()));
+            System.out.println("\n--- Получение первого пользователя ---");
+            Optional<User> userOptional = userService.getUserById(users.getFirst().getId());
+            userOptional.ifPresent(u -> System.out.println("Найден пользователь: " + u));
+
+            System.out.println("\n--- Обновление первого пользователя ---");
+
+
+            userOptional.ifPresent(u ->System.out.println("До обновления: " + u));
+            userOptional.ifPresent(u ->userService.updateUser(u.getId(), "Глория"));
+
+            System.out.println("\n--- Удаление пользователя последнего---");
+            User user = users.getLast();
+            System.out.println("До удаления: " + user);
+            userService.deleteUser(user.getId());
+
+            System.out.println("\n--- Итоговый список пользователей---");
+            userService.getAllUsers().forEach(System.out::println);
         }
-
-        System.out.println("\n--- Удаление второго пользователя ---");
-        if (usersList.size() > 1) {
-            Long idToDelete = usersList.get(1).getId();
-            usersDAO.deleteUsers(idToDelete);
-        }
-
-        System.out.println("\n--- Итоговый список пользователей ---");
-        usersDAO.getAllUsers().forEach(System.out::println);
-
-        usersDAO.shutdown();
-        context.close();
     }
 }
+
